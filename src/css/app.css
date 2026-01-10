@@ -1,0 +1,42 @@
+/* app global css */
+.text-brand {
+  color: #d8952c !important;
+}
+.bg-gold {
+  background: #d8952c !important;
+}
+
+/* Light theme background */
+.bg-brand {
+  background: #f3f4f6 !important;
+}
+
+/* Dark theme background */
+.body--dark .bg-brand {
+  background: #121212 !important;
+}
+
+/* Card backgrounds for dark theme */
+.body--dark .q-card {
+  background: #1e1e1e !important;
+}
+
+/* Item backgrounds for dark theme (like q-item in settings) */
+.body--dark .q-item {
+  background: #2d2d2d !important;
+}
+
+/* Input backgrounds for dark theme */
+.body--dark .q-field--outlined .q-field__control {
+  background: #2d2d2d !important;
+}
+.bg-silver {
+  background: #c0c0c0 !important;
+}
+.rounded-borders {
+  border-radius: 25px !important;
+}
+
+.rounded-small-borders {
+  border-radius: 20px !important;
+}

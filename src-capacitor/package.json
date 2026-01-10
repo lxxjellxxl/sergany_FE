@@ -1,0 +1,13 @@
+{
+  "name": "sergany",
+  "version": "0.0.1",
+  "description": "Trading platform designed primarily for trading gold and other precious metals. It aims to provide users with direct access to the gold markets",
+  "author": "Walid Zakaria <walidpiano@yahoo.com>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^6.2.1",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
