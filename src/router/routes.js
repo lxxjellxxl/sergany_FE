@@ -10,19 +10,6 @@ const routes = [
         meta: { requiresAuth: true, requiresKYC: true },
       },
 
-      // --- MARKET (Requires KYC) ---
-      // Added these so the "Market Validation" works
-      {
-        path: '/gold',
-        component: () => import('pages/Gold/GoldBuy.vue'),
-        meta: { requiresAuth: true, requiresKYC: true },
-      },
-      {
-        path: '/silver',
-        component: () => import('pages/Silver/SilverBuy.vue'),
-        meta: { requiresAuth: true, requiresKYC: true },
-      },
-
       // --- FINANCIALS (Requires KYC) ---
       {
         path: '/wallet',
