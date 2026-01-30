@@ -24,24 +24,26 @@
       <router-view />
     </q-page-container>
 
-    <!-- Bottom Navigation - Only show on specific pages -->
+    <!-- Bottom Navigation - Optimized for Mobile -->
     <q-footer
       v-if="showBottomNavigation"
+      bordered
       :class="$q.dark.isActive ? 'bg-grey-10 text-white' : 'bg-white text-dark'"
     >
       <q-tabs
         v-model="activeTab"
         dense
-        :class="$q.dark.isActive ? 'text-grey-4' : 'text-grey-5'"
-        class="q-pa-sm"
-        active-color="amber"
+        :class="$q.dark.isActive ? 'text-grey-4' : 'text-grey-6'"
+        active-color="amber-8"
         indicator-color="transparent"
+        align="justify"
         @update:model-value="handleTabChange"
+        style="height: 60px"
       >
-        <q-tab name="home" icon="home" label="Home" />
-        <q-tab name="wallet" icon="account_balance_wallet" label="Wallet" />
-        <q-tab name="portfolio" icon="person" label="Portfolio" />
-        <q-tab name="settings" icon="settings" label="Settings" />
+        <q-tab name="home" icon="home" label="Home" no-caps class="q-py-xs" />
+        <q-tab name="wallet" icon="account_balance_wallet" label="Wallet" no-caps class="q-py-xs" />
+        <q-tab name="portfolio" icon="person" label="Portfolio" no-caps class="q-py-xs" />
+        <q-tab name="settings" icon="settings" label="Settings" no-caps class="q-py-xs" />
       </q-tabs>
     </q-footer>
   </q-layout>
@@ -53,7 +55,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useNotificationsStore } from 'src/stores/notifications-store'
 import { useAuthStore } from 'src/stores/auth-store'
-import { useTransactionsStore } from 'src/stores/transactions-store' // Import Transactions Store
+import { useTransactionsStore } from 'src/stores/transactions-store'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -61,13 +63,11 @@ const route = useRoute()
 const $q = useQuasar()
 const activeTab = ref('home')
 const notificationsStore = useNotificationsStore()
-const transactionsStore = useTransactionsStore() // Init Store
+const transactionsStore = useTransactionsStore()
 const unreadCount = ref(0)
 
-// Connect cart count to the store getter
 const cartCount = computed(() => transactionsStore.cartItemCount)
 
-// Automatically update unreadCount when notificationsStore.unreadCount changes
 watch(
   () => notificationsStore.unreadCount,
   (val) => {
@@ -76,19 +76,15 @@ watch(
   { immediate: true },
 )
 
-// Fetch data on mount
 onMounted(async () => {
   if (authStore.isAuthenticated) {
-    // 1. Fetch Notifications
     if (notificationsStore.unreadCount === 0) {
       unreadCount.value = await notificationsStore.fetchUnreadCount()
     }
-    // 2. Fetch Cart Count from Backend
     await transactionsStore.fetchCart()
   }
 })
 
-// Map route paths to page titles
 const pageTitles = {
   '/': 'Home',
   '/wallet': 'Wallet',
@@ -100,16 +96,13 @@ const pageTitles = {
   '/account-info': 'Account Info',
   '/identity-verification': 'Identity Verification',
   '/complete-verification': 'Identity Verification',
-  '/pending-verification': 'Identity Verification',
   '/rejected-verification': 'Identity Verification',
-  // Add more routes and titles as needed
 }
 
 const pageTitle = computed(() => {
-  return pageTitles[route.path] || 'Sergany'
+  return pageTitles[route.path] || ''
 })
 
-// Pages where bottom navigation should be shown
 const pagesWithNavigation = [
   '/',
   '/wallet',
@@ -127,51 +120,30 @@ const pagesWithNavigation = [
   '/refer-earn',
 ]
 
-// Computed property to determine if bottom navigation should be shown
 const showBottomNavigation = computed(() => {
   return pagesWithNavigation.includes(route.path)
 })
 
-// Show header only on specific pages
 const showHeader = computed(() => {
-  return [
-    '/',
-    '/settings',
-    '/portfolio',
-    '/wallet',
-    '/pending-verification',
-    '/enter-pin-code',
-  ].includes(route.path)
+  return ['/', '/settings', '/portfolio', '/wallet', '/enter-pin-code'].includes(route.path)
 })
 
-// Watch for route changes and update active tab
 watch(
   () => route.path,
   (newPath) => {
-    if (newPath === '/') {
-      activeTab.value = 'home'
-    } else if (newPath === '/wallet') {
-      activeTab.value = 'wallet'
-    } else if (newPath === '/portfolio') {
-      activeTab.value = 'portfolio'
-    } else if (newPath === '/settings') {
-      activeTab.value = 'settings'
-    }
+    if (newPath === '/') activeTab.value = 'home'
+    else if (newPath === '/wallet') activeTab.value = 'wallet'
+    else if (newPath === '/portfolio') activeTab.value = 'portfolio'
+    else if (newPath === '/settings') activeTab.value = 'settings'
   },
   { immediate: true },
 )
 
-// Handle tab changes
 const handleTabChange = (tabName) => {
-  if (tabName === 'home') {
-    router.push('/')
-  } else if (tabName === 'wallet') {
-    router.push('/wallet')
-  } else if (tabName === 'portfolio') {
-    router.push('/portfolio')
-  } else if (tabName === 'settings') {
-    router.push('/settings')
-  }
+  if (tabName === 'home') router.push('/')
+  else if (tabName === 'wallet') router.push('/wallet')
+  else if (tabName === 'portfolio') router.push('/portfolio')
+  else if (tabName === 'settings') router.push('/settings')
 }
 
 function goToCart() {

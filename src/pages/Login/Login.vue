@@ -1,9 +1,11 @@
 <template>
-  <div class="bg-blue-10 text-white text-center q-pa-xs text-caption">Target: {{ apiUrl }}</div>
+  <!-- Debug Banner -->
+  <!-- <div class="bg-blue-10 text-white text-center q-pa-xs text-caption">Target: {{ apiUrl }}</div> -->
 
   <div class="q-pa-lg">
     <div class="logo-container serganyLogo text-center q-mb-md">
-      <img src="/public/serganyLogo - gold.png" alt="Sergany Logo" width="250" />
+      <!-- Fixed: Use imported logo for reliable path resolution -->
+      <img :src="logo" alt="Sergany Logo" width="250" />
     </div>
 
     <div class="welcome-text q-mb-xl">
@@ -12,6 +14,7 @@
     </div>
 
     <q-form @submit="onLogin" class="login-form">
+      <!-- Email Input -->
       <div class="q-mb-md">
         <q-input
           v-model="loginForm.email"
@@ -23,6 +26,7 @@
         />
       </div>
 
+      <!-- Password Input -->
       <div class="q-mb-sm">
         <q-input
           v-model="loginForm.password"
@@ -43,6 +47,7 @@
           </template>
         </q-input>
 
+        <!-- Forgot Password Link -->
         <div v-if="showForgotPassword" class="text-right q-mt-xs q-px-xs">
           <router-link
             to="/forgot-password"
@@ -54,12 +59,14 @@
         </div>
       </div>
 
+      <!-- Error Message -->
       <div v-if="generalError" class="q-mb-md">
         <q-banner class="text-white bg-negative rounded-borders">
           {{ generalError }}
         </q-banner>
       </div>
 
+      <!-- Login Button -->
       <q-btn
         type="submit"
         label="Login"
@@ -69,15 +76,17 @@
         rounded
       />
 
-      <div
+      <!-- Debug Info -->
+      <!-- <div
         v-if="debugLog"
         class="q-mt-lg bg-grey-3 q-pa-sm rounded-borders"
         style="word-break: break-all; font-family: monospace; font-size: 10px"
       >
         <strong>DEBUG INFO:</strong>
         <pre>{{ debugLog }}</pre>
-      </div>
+      </div> -->
 
+      <!-- Signup Link -->
       <div class="text-center q-mt-xl">
         <span class="text-grey-7 text-body2">
           Do not have an account yet?
@@ -96,6 +105,7 @@ import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useAuthStore } from 'src/stores/auth-store'
 import { useUsersStore } from 'src/stores/users-store'
+import logo from 'src/assets/serganyLogo - gold.png' // Import logo directly
 
 const apiUrl = process.env.API_BASE_URL
 const $q = useQuasar()
@@ -104,10 +114,10 @@ const authStore = useAuthStore()
 const userStore = useUsersStore()
 
 const showPassword = ref(false)
-const showForgotPassword = ref(false) // New variable to control visibility
+const showForgotPassword = ref(false)
 const loading = ref(false)
 const generalError = ref('')
-const debugLog = ref('') // New Debug Variable
+const debugLog = ref('')
 
 const loginForm = reactive({
   email: '',
@@ -120,8 +130,10 @@ const onLogin = async () => {
   debugLog.value = 'Sending request...'
 
   try {
+    // --- THE FIX ---
+    // Using 'email' key because Django Djoser LOGIN_FIELD = 'email'
     const credentials = {
-      username: loginForm.email,
+      email: loginForm.email,
       password: loginForm.password,
     }
 
@@ -137,28 +149,32 @@ const onLogin = async () => {
       router.replace('/')
     }
   } catch (error) {
-    // Show the forgot password link when an error happens
     showForgotPassword.value = true
 
-    // --- CAPTURE FULL ERROR DETAILS ---
+    // --- Capture Debug Info ---
     const debugData = {
       message: error.message,
       code: error.code,
       url: error.config?.url,
       baseURL: error.config?.baseURL,
       method: error.config?.method,
-      requestHeaders: error.config?.headers, // Check if ngrok header is here
+      requestHeaders: error.config?.headers,
       responseStatus: error.response?.status,
       responseData: error.response?.data,
     }
 
     debugLog.value = JSON.stringify(debugData, null, 2)
-    // ----------------------------------
+    // --------------------------
 
     if (error.response) {
-      generalError.value = `Server Error: ${error.response.status}`
+      const data = error.response.data
+      if (data.non_field_errors) {
+        generalError.value = data.non_field_errors[0]
+      } else {
+        generalError.value = `Login failed: ${error.response.status}`
+      }
     } else if (error.request) {
-      generalError.value = 'Network Error: Request was made but no response received.'
+      generalError.value = 'Network Error: Server not reachable.'
     } else {
       generalError.value = error.message
     }

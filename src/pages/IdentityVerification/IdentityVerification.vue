@@ -4,7 +4,8 @@
     <div class="row items-center justify-between q-mb-lg">
       <q-btn flat round icon="arrow_back" color="grey-7" @click="goBack" />
       <div class="text-h5 text-weight-bold">Identity verification</div>
-      <div style="width: 40px;"></div> <!-- Spacer for centering -->
+      <div style="width: 40px"></div>
+      <!-- Spacer for centering -->
     </div>
 
     <!-- Content Container -->
@@ -22,14 +23,20 @@
       <div class="text-center q-mb-xl">
         <div class="text-h6 text-weight-bold q-mb-md">No document uploaded!</div>
         <div class="text-body2 text-grey-6 q-px-md">
-          We're waiting for your document to start the<br>
+          We're waiting for your document to start the<br />
           verification process.
         </div>
       </div>
 
       <!-- Upload Button -->
-      <q-btn label="Upload Documents" class="bg-gold text-white full-width q-py-sm text-weight-bold upload-btn" no-caps
-        rounded size="md" @click="handleUpload" />
+      <q-btn
+        label="Upload Documents"
+        class="bg-gold text-white full-width q-py-sm text-weight-bold upload-btn"
+        no-caps
+        rounded
+        size="md"
+        @click="handleUpload"
+      />
     </div>
   </q-page>
 </template>
@@ -39,7 +46,6 @@ import { useRouter } from 'vue-router'
 // Import the users store and get fetchCurrentUser from it
 
 const router = useRouter()
-
 
 // Methods
 const goBack = () => {

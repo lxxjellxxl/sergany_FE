@@ -22,7 +22,6 @@ export default route(function ({ store }) {
     const authStore = useAuthStore(store)
     const usersStore = useUsersStore(store)
 
-    // 1. HEADER SYNC: Ensure token is always attached
     if (authStore.token) {
       api.defaults.headers.common['Authorization'] = `Token ${authStore.token}`
     }
@@ -31,99 +30,47 @@ export default route(function ({ store }) {
     const isPublicPage =
       to.meta.isPublic || ['/login', '/register', '/forgot-password'].includes(to.path)
 
-    // 2. REDIRECT LOGGED-IN USERS from Login
-    if (to.path === '/login' && isLoggedIn) {
-      return next('/')
-    }
+    // 1. Basic Auth Checks (Non-async, very fast)
+    if (to.path === '/login' && isLoggedIn) return next('/')
+    if (!isPublicPage && !isLoggedIn) return next('/login')
 
-    // 3. BLOCK GUESTS from Protected Pages
-    if (!isPublicPage && !isLoggedIn) {
-      return next('/login')
-    }
-
-    // 4. LOAD USER PROFILE (Critical for Flags)
-    // If we are logged in but don't have the profile flags (like is_kyc_verified), fetch them.
-    // Note: usersStore.currentUser is null initially
+    // 2. Optimized Profile Fetching
+    // Only fetch if logged in AND we don't have a user, OR if we specifically want to refresh
     if (isLoggedIn && !usersStore.currentUser?.id) {
       try {
         await usersStore.fetchCurrentUser()
       } catch (error) {
-        console.error('Router: Failed to fetch profile', error)
         if (error.response?.status === 401) {
           authStore.logout()
           return next('/login')
         }
+        // If it's a network error, don't freeze, just let them through or show error
       }
     }
 
-    // Access the state directly (or use getter if preferred)
     const user = usersStore.currentUser || {}
+    const status = user.kyc_request_status
 
-    // --- 5. KYC VALIDATION ---
-    if (to.meta.requiresKYC) {
-      if (!user.is_kyc_verified) {
-        const status = user.kyc_request_status
+    // 3. Prevent Infinite Redirects (The Freeze Fix)
+    // If the user is already on the target page, just let them stay there!
+    if (to.path === '/pending-verification' && status === 'PENDING') return next()
+    if (to.path === '/rejected-verification' && status === 'REJECTED') return next()
 
-        // Route them based on their exact KYC status
-        if (status === 'PENDING') {
-          if (to.path !== '/pending-verification') return next('/pending-verification')
-        } else if (status === 'REJECTED') {
-          if (to.path !== '/rejected-verification') return next('/rejected-verification')
-        } else {
-          // No status or null -> Send to start
-          if (
-            ![
-              '/identity-verification',
-              '/submit-id',
-              '/upload-documents',
-              '/submit-your-id',
-            ].includes(to.path)
-          ) {
-            Notify.create({
-              type: 'warning',
-              message: 'Access Denied: Please complete Identity Verification.',
-              position: 'top',
-              timeout: 3000,
-            })
-            return next('/identity-verification')
-          }
-        }
+    // 4. KYC Gatekeeper
+    if (to.meta.requiresKYC && !user.is_kyc_verified) {
+      if (status === 'PENDING') return next('/pending-verification')
+      if (status === 'REJECTED') return next('/rejected-verification')
+
+      // Prevent redirecting if already going to an identity page
+      const identityPages = ['/identity-verification', '/submit-id', '/upload-documents']
+      if (!identityPages.includes(to.path)) {
+        return next('/identity-verification')
       }
     }
 
-    // --- 6. PIN VALIDATION ---
-    if (to.meta.requiresPin) {
-      if (!user.is_pin_set) {
-        if (to.path !== '/set-pin-code') {
-          Notify.create({
-            type: 'warning',
-            message: 'Access Denied: Please set a Transaction PIN first.',
-            position: 'top',
-            timeout: 3000,
-          })
-          return next('/set-pin-code')
-        }
-      }
-    }
-
-    // --- 7. BALANCE VALIDATION ---
-    if (to.meta.requiresBalance) {
-      const balance = parseFloat(user.wallet_balance || 0)
-      if (balance <= 0) {
-        Notify.create({
-          type: 'negative',
-          message: 'Insufficient Balance. Please deposit funds.',
-          position: 'top',
-          timeout: 4000,
-          actions: [{ label: 'Go to Wallet', color: 'white', handler: () => next('/wallet') }],
-        })
-        return next('/wallet')
-      }
-    }
-
-    // --- 8. ADMIN PROTECTION ---
-    if (to.meta.requiresAdmin && isLoggedIn && !authStore.isAdmin) {
-      return next('/')
+    // 5. Pin Gatekeeper
+    if (to.meta.requiresPin && !user.is_pin_set && to.path !== '/set-pin-code') {
+      return next('/set-pin-code')
     }
 
     next()

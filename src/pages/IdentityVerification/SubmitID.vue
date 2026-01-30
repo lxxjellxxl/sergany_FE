@@ -10,8 +10,8 @@
     <div class="page-content">
       <!-- Description -->
       <div class="text-body2 text-grey-7 q-mb-xl description-text">
-        To verify your identity, please take clear photos of both the front and back of your ID card. Ensure all details
-        are visible and the images are not blurry or obstructed.
+        To verify your identity, please take clear photos of both the front and back of your ID
+        card. Ensure all details are visible and the images are not blurry or obstructed.
       </div>
 
       <!-- ID Card Front Side -->
@@ -25,15 +25,36 @@
 
             <!-- Upload options -->
             <div class="upload-options">
-              <q-btn outline color="gold" icon="photo_library" label="Upload" size="sm" @click="selectFrontImage"
-                class="q-mr-sm" />
-              <q-btn outline color="gold" icon="photo_camera" label="Camera" size="sm" @click="openFrontCamera" />
+              <q-btn
+                outline
+                color="gold"
+                icon="photo_library"
+                label="Upload"
+                size="sm"
+                @click="selectFrontImage"
+                class="q-mr-sm"
+              />
+              <q-btn
+                outline
+                color="gold"
+                icon="photo_camera"
+                label="Camera"
+                size="sm"
+                @click="openFrontCamera"
+              />
             </div>
           </div>
 
           <div v-else class="image-preview">
             <img :src="frontImageUrl" alt="ID Front" class="uploaded-image" />
-            <q-btn round icon="close" size="sm" color="red" class="remove-btn" @click.stop="removeFrontImage" />
+            <q-btn
+              round
+              icon="close"
+              size="sm"
+              color="red"
+              class="remove-btn"
+              @click.stop="removeFrontImage"
+            />
           </div>
         </div>
       </div>
@@ -49,15 +70,36 @@
 
             <!-- Upload options -->
             <div class="upload-options">
-              <q-btn outline color="gold" icon="photo_library" label="Upload" size="sm" @click="selectBackImage"
-                class="q-mr-sm" />
-              <q-btn outline color="gold" icon="photo_camera" label="Camera" size="sm" @click="openBackCamera" />
+              <q-btn
+                outline
+                color="gold"
+                icon="photo_library"
+                label="Upload"
+                size="sm"
+                @click="selectBackImage"
+                class="q-mr-sm"
+              />
+              <q-btn
+                outline
+                color="gold"
+                icon="photo_camera"
+                label="Camera"
+                size="sm"
+                @click="openBackCamera"
+              />
             </div>
           </div>
 
           <div v-else class="image-preview">
             <img :src="backImageUrl" alt="ID Back" class="uploaded-image" />
-            <q-btn round icon="close" size="sm" color="red" class="remove-btn" @click.stop="removeBackImage" />
+            <q-btn
+              round
+              icon="close"
+              size="sm"
+              color="red"
+              class="remove-btn"
+              @click.stop="removeBackImage"
+            />
           </div>
         </div>
       </div>
@@ -66,7 +108,11 @@
       <div class="upload-section q-mb-xl">
         <div class="text-body2 text-weight-medium q-mb-md">Selfie Photo</div>
 
-        <div class="upload-area selfie-area" :class="{ 'has-image': selfieImage }" @click="openSelfieCamera">
+        <div
+          class="upload-area selfie-area"
+          :class="{ 'has-image': selfieImage }"
+          @click="openSelfieCamera"
+        >
           <div v-if="!selfieImage" class="upload-placeholder">
             <q-icon name="face" size="40px" color="gold" />
             <div class="text-body2 text-grey-6 q-mt-sm">Take a selfie</div>
@@ -74,20 +120,46 @@
 
           <div v-else class="image-preview">
             <img :src="selfieImageUrl" alt="Selfie" class="uploaded-image" />
-            <q-btn round icon="close" size="sm" color="red" class="remove-btn" @click.stop="removeSelfieImage" />
+            <q-btn
+              round
+              icon="close"
+              size="sm"
+              color="red"
+              class="remove-btn"
+              @click.stop="removeSelfieImage"
+            />
           </div>
         </div>
       </div>
 
       <!-- Next Button -->
-      <q-btn :label="isSubmitting ? 'Submitting...' : 'Submit Documents'"
-        :color="canProceed && !isSubmitting ? 'gold' : 'grey-5'" text-color="white" no-caps unelevated
-        :disable="!canProceed || isSubmitting" :loading="isSubmitting" class="full-width next-btn"
-        @click="proceedToNext" />
+      <q-btn
+        :label="isSubmitting ? 'Submitting...' : 'Submit Documents'"
+        :color="canProceed && !isSubmitting ? 'gold' : 'grey-5'"
+        text-color="white"
+        no-caps
+        unelevated
+        :disable="!canProceed || isSubmitting"
+        :loading="isSubmitting"
+        class="full-width next-btn"
+        @click="proceedToNext"
+      />
 
       <!-- Hidden File Inputs -->
-      <input ref="frontFileInput" type="file" accept="image/*" style="display: none" @change="handleFrontImageSelect" />
-      <input ref="backFileInput" type="file" accept="image/*" style="display: none" @change="handleBackImageSelect" />
+      <input
+        ref="frontFileInput"
+        type="file"
+        accept="image/*"
+        style="display: none"
+        @change="handleFrontImageSelect"
+      />
+      <input
+        ref="backFileInput"
+        type="file"
+        accept="image/*"
+        style="display: none"
+        @change="handleBackImageSelect"
+      />
     </div>
 
     <!-- Camera Modal -->
@@ -95,8 +167,13 @@
       <q-card class="camera-card">
         <q-card-section class="text-center">
           <div class="text-h6 q-mb-md">
-            {{ cameraMode === 'front' ? 'Take Front ID Photo' :
-              cameraMode === 'back' ? 'Take Back ID Photo' : 'Take Your Selfie' }}
+            {{
+              cameraMode === 'front'
+                ? 'Take Front ID Photo'
+                : cameraMode === 'back'
+                  ? 'Take Back ID Photo'
+                  : 'Take Your Selfie'
+            }}
           </div>
 
           <!-- Camera Video -->
@@ -121,12 +198,19 @@
           </div>
 
           <!-- Hidden canvas for capturing -->
-          <canvas ref="canvasElement" style="display: none;"></canvas>
+          <canvas ref="canvasElement" style="display: none"></canvas>
         </q-card-section>
 
         <q-card-actions align="center" class="q-pa-md">
           <!-- Capture Button -->
-          <q-btn round size="lg" color="gold" icon="camera" @click="capturePhoto" class="capture-btn" />
+          <q-btn
+            round
+            size="lg"
+            color="gold"
+            icon="camera"
+            @click="capturePhoto"
+            class="capture-btn"
+          />
 
           <!-- Cancel Button -->
           <q-btn flat label="Cancel" color="grey-7" @click="closeCamera" class="q-ml-md" />
@@ -241,14 +325,14 @@ const openCamera = async () => {
     showCamera.value = true
 
     // Wait for dialog to open
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
 
     // Configure camera based on mode
     const cameraConfig = {
       video: {
         width: { ideal: cameraMode.value === 'selfie' ? 640 : 1280 },
-        height: { ideal: cameraMode.value === 'selfie' ? 480 : 720 }
-      }
+        height: { ideal: cameraMode.value === 'selfie' ? 480 : 720 },
+      },
     }
 
     // Use front camera for selfie, back camera for ID documents
@@ -264,7 +348,6 @@ const openCamera = async () => {
     if (videoElement.value) {
       videoElement.value.srcObject = stream
     }
-
   } catch (error) {
     console.error('Camera access denied:', error)
     showCamera.value = false
@@ -286,39 +369,43 @@ const capturePhoto = () => {
   context.drawImage(video, 0, 0, canvas.width, canvas.height)
 
   // Convert canvas to blob
-  canvas.toBlob((blob) => {
-    if (blob) {
-      // Create file from blob with appropriate name
-      const fileName = `${cameraMode.value}_${Date.now()}.jpg`
-      const file = new File([blob], fileName, {
-        type: 'image/jpeg'
-      })
+  canvas.toBlob(
+    (blob) => {
+      if (blob) {
+        // Create file from blob with appropriate name
+        const fileName = `${cameraMode.value}_${Date.now()}.jpg`
+        const file = new File([blob], fileName, {
+          type: 'image/jpeg',
+        })
 
-      // Create URL for preview
-      const imageUrl = URL.createObjectURL(blob)
+        // Create URL for preview
+        const imageUrl = URL.createObjectURL(blob)
 
-      // Set the captured image based on mode
-      if (cameraMode.value === 'front') {
-        frontImage.value = file
-        frontImageUrl.value = imageUrl
-      } else if (cameraMode.value === 'back') {
-        backImage.value = file
-        backImageUrl.value = imageUrl
-      } else if (cameraMode.value === 'selfie') {
-        selfieImage.value = file
-        selfieImageUrl.value = imageUrl
+        // Set the captured image based on mode
+        if (cameraMode.value === 'front') {
+          frontImage.value = file
+          frontImageUrl.value = imageUrl
+        } else if (cameraMode.value === 'back') {
+          backImage.value = file
+          backImageUrl.value = imageUrl
+        } else if (cameraMode.value === 'selfie') {
+          selfieImage.value = file
+          selfieImageUrl.value = imageUrl
+        }
+
+        // Close camera
+        closeCamera()
       }
-
-      // Close camera
-      closeCamera()
-    }
-  }, 'image/jpeg', 0.8)
+    },
+    'image/jpeg',
+    0.8,
+  )
 }
 
 const closeCamera = () => {
   // Stop camera stream
   if (cameraStream.value) {
-    cameraStream.value.getTracks().forEach(track => {
+    cameraStream.value.getTracks().forEach((track) => {
       track.stop()
     })
     cameraStream.value = null
@@ -343,7 +430,7 @@ const proceedToNext = async () => {
     Notify.create({
       type: 'positive',
       message: 'Documents submitted successfully!',
-      position: 'top-right'
+      position: 'top-right',
     })
 
     router.push('/uploaded-documents')
@@ -351,12 +438,13 @@ const proceedToNext = async () => {
     console.error('KYC submission failed:', error)
 
     const fallback = 'Failed to submit documents. Please try again.'
-    const message = error.response?.data?.message || error.response?.data?.detail || error.message || fallback
+    const message =
+      error.response?.data?.message || error.response?.data?.detail || error.message || fallback
 
     Notify.create({
       type: 'negative',
       message,
-      position: 'top-right'
+      position: 'top-right',
     })
   } finally {
     isSubmitting.value = false
@@ -381,7 +469,7 @@ const proceedToNext = async () => {
 .upload-area {
   width: 100%;
   height: 200px;
-  border: 2px dashed #FDC82A;
+  border: 2px dashed #fdc82a;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -394,7 +482,7 @@ const proceedToNext = async () => {
 
 .upload-area:hover {
   background: rgba(253, 200, 42, 0.1);
-  border-color: #F39C12;
+  border-color: #f39c12;
 }
 
 .upload-area.has-image {
@@ -442,8 +530,8 @@ const proceedToNext = async () => {
 }
 
 .next-btn[disabled] {
-  background: #E0E0E0 !important;
-  color: #9E9E9E !important;
+  background: #e0e0e0 !important;
+  color: #9e9e9e !important;
 }
 
 /* Upload options styling */
@@ -456,7 +544,7 @@ const proceedToNext = async () => {
 
 /* Selfie area styling */
 .selfie-area {
-  border-color: #4CAF50;
+  border-color: #4caf50;
   background: rgba(76, 175, 80, 0.05);
 }
 
@@ -532,7 +620,7 @@ const proceedToNext = async () => {
   position: absolute;
   width: 20px;
   height: 20px;
-  border: 3px solid #FDC82A;
+  border: 3px solid #fdc82a;
 }
 
 .corner.top-left {
@@ -564,7 +652,7 @@ const proceedToNext = async () => {
 }
 
 .id-guide-text {
-  color: #FDC82A;
+  color: #fdc82a;
   font-weight: bold;
   font-size: 16px;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
@@ -599,6 +687,6 @@ const proceedToNext = async () => {
 }
 
 .body--dark .camera-card {
-  background: #1E1E1E;
+  background: #1e1e1e;
 }
 </style>

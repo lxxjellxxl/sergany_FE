@@ -21,8 +21,8 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history',
 
       env: {
-        // USE THE URL YOU JUST GOT IN THE TERMINAL
-        API_BASE_URL: 'http://localhost:8000/',
+        // Point to the DigitalOcean Server
+        API_BASE_URL: 'http://164.90.163.108',
       },
 
       vitePlugins: [

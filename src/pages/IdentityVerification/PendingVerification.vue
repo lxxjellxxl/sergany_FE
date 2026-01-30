@@ -1,6 +1,6 @@
 <template>
   <!-- 1. Wrap everything in q-page -->
-  <q-page class="bg-white">
+  <q-page class="bg-white q-pa-md">
     <!-- Content -->
     <div class="column flex-center text-center q-px-lg">
       <div class="icon-container q-mb-lg">
@@ -49,17 +49,44 @@
 </template>
 
 <script setup>
+import { onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUsersStore } from 'src/stores/users-store'
 
 const router = useRouter()
+const usersStore = useUsersStore()
+let pollingInterval = null
 
-const goBack = () => {
-  router.go(-1)
+const checkStatus = async () => {
+  try {
+    await usersStore.fetchCurrentUser()
+    // If status changed from PENDING, the router gatekeeper
+    // in index.js will now allow them to pass.
+    if (usersStore.currentUser?.is_kyc_verified) {
+      router.replace('/')
+    } else if (usersStore.currentUser?.kyc_request_status === 'REJECTED') {
+      router.replace('/rejected-verification')
+    }
+  } catch (error) {
+    console.error('Failed to refresh status:', error)
+  }
 }
 
-const goToHome = () => {
+const goToHome = async () => {
+  // Force a refresh right before trying to go home
+  await checkStatus()
   router.replace('/')
 }
+
+onMounted(() => {
+  // Poll every 10 seconds so the user doesn't have to click anything
+  pollingInterval = setInterval(checkStatus, 10000)
+})
+
+onUnmounted(() => {
+  // Critical: Stop the timer when the user leaves the page
+  if (pollingInterval) clearInterval(pollingInterval)
+})
 </script>
 
 <style scoped>
