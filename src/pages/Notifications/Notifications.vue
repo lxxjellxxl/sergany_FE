@@ -6,12 +6,22 @@
       <q-btn flat round icon="arrow_back" color="grey-7" @click="goBack" />
       <div class="text-h5 text-weight-bold q-ml-sm">Notifications</div>
     </div>
-
     <!-- Notifications List -->
-    <div v-if="notifications && notifications.results && notifications.results.length > 0" class="q-mb-lg">
+    <div
+      v-if="
+        (Array.isArray(notifications) && notifications.length > 0) ||
+        (notifications.results && notifications.results.length > 0)
+      "
+      class="q-mb-lg"
+    >
       <q-list bordered class="notification-list q-pa-sm">
-        <q-item v-for="notif in notifications.results" :key="notif.id" clickable v-ripple
-          @click="handleNotificationClick(notif)">
+        <q-item
+          v-for="notif in notifications.results || notifications"
+          :key="notif.id"
+          clickable
+          v-ripple
+          @click="handleNotificationClick(notif)"
+        >
           <q-item-section avatar>
             <q-avatar size="40px" class="bg-amber-3">
               <q-icon name="notifications" color="amber-8" />
@@ -22,7 +32,9 @@
               {{ notif.title || 'Notification' }}
             </q-item-label>
             <q-item-label caption>{{ notif.message }}</q-item-label>
-            <q-item-label caption class="text-grey-6">{{ formatDate(notif.created_at) }}</q-item-label>
+            <q-item-label caption class="text-grey-6">{{
+              formatDate(notif.created_at)
+            }}</q-item-label>
           </q-item-section>
           <q-item-section side v-if="!notif.is_read">
             <q-badge color="amber-6" label="New" />
@@ -31,8 +43,13 @@
       </q-list>
       <!-- Pagination Controls -->
       <div class="q-mt-lg flex flex-center">
-        <q-pagination v-model="currentPage" :max="totalPages" color="amber-6" size="md"
-          @update:model-value="onPageChange" />
+        <q-pagination
+          v-model="currentPage"
+          :max="totalPages"
+          color="amber-6"
+          size="md"
+          @update:model-value="onPageChange"
+        />
       </div>
     </div>
 
@@ -65,7 +82,7 @@
       </div>
 
       <div class="text-h6 text-weight-bold q-mb-md text-center">First time here?</div>
-      <div class="text-body2 text-grey-7 text-center" style="max-width: 300px; line-height: 1.5;">
+      <div class="text-body2 text-grey-7 text-center" style="max-width: 300px; line-height: 1.5">
         This is where you'll see all your important notifications.
       </div>
     </div>
@@ -95,7 +112,7 @@ const handleNotificationClick = async (notif) => {
     await notificationsStore.markNotificationAsRead(notif.id)
     // Only update the clicked notification locally, avoid refetching all
     const notifList = notifications.value.results || []
-    const idx = notifList.findIndex(n => n.id === notif.id)
+    const idx = notifList.findIndex((n) => n.id === notif.id)
     if (idx !== -1) {
       notifList[idx].is_read = true
     }
@@ -105,11 +122,18 @@ const handleNotificationClick = async (notif) => {
 
 const fetchPage = async (page = 1) => {
   try {
-    notifications.value = await notificationsStore.fetchNotifications({ page })
+    const data = await notificationsStore.fetchNotifications({ page })
+    notifications.value = data
     unreadCount.value = await notificationsStore.fetchUnreadCount()
-    totalPages.value = Math.ceil((notifications.value.count || 0) / pageSize)
-  } catch {
-    // Handle error if needed
+
+    // If backend returns a raw array, totalPages should be 1
+    if (Array.isArray(data)) {
+      totalPages.value = 1
+    } else {
+      totalPages.value = Math.ceil((data.count || 0) / pageSize)
+    }
+  } catch (error) {
+    console.error('Fetch error:', error)
   }
 }
 
@@ -137,7 +161,6 @@ function formatDate(dateStr) {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-
 }
 
 .text-bold {
@@ -237,7 +260,10 @@ function formatDate(dateStr) {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  box-shadow: -12px 0 0 #333, 12px 0 0 #333, 0 15px 0 2px #333;
+  box-shadow:
+    -12px 0 0 #333,
+    12px 0 0 #333,
+    0 15px 0 2px #333;
 }
 
 .character-shirt {

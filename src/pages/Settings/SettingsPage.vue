@@ -7,19 +7,6 @@
 
     <!-- Login Button (Only if needed, usually hidden for logged in users) -->
     <!-- Keeping it as per your provided code -->
-    <q-card class="settings-item q-mb-sm rounded-small-borders" @click="goToLoginPage">
-      <q-item clickable v-ripple class="q-py-lg">
-        <q-item-section avatar>
-          <q-icon name="login" color="grey-7" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label class="text-weight-medium text-body1">Login</q-item-label>
-        </q-item-section>
-        <q-item-section side>
-          <q-icon name="chevron_right" color="amber-6" />
-        </q-item-section>
-      </q-item>
-    </q-card>
 
     <!-- Account Section -->
     <div class="q-mb-lg">
